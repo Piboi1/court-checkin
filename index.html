@@ -37,6 +37,8 @@
 </head>
 <body>
 
+  <div id="messageScreen" style="display:none; text-align:center; padding: 50px; font-size: 20px; font-weight: bold; color: blue;"></div>
+
   <h2>🏀 Morrisville Court Check-In</h2>
 
   <form id="checkinForm">
@@ -83,48 +85,61 @@
     <button type="submit">Check In</button>
   </form>
 
-<script>
-  const form = document.getElementById("checkinForm");
-  const submitBtn = form.querySelector("button[type='submit']");
+  <script>
+    const form = document.getElementById("checkinForm");
+    const submitBtn = form.querySelector("button[type='submit']");
+    const messageScreen = document.getElementById("messageScreen");
 
-  form.addEventListener("submit", function(event) {
-    event.preventDefault();
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
 
-    // Create and show loading message
-    const loadingMsg = document.createElement("p");
-    loadingMsg.textContent = "Submitting, please wait...";
-    loadingMsg.style.color = "blue";  // optional styling
-    loadingMsg.id = "loadingMsg";     // so we can find & remove it later
-    form.appendChild(loadingMsg);
+  submitBtn.disabled = true;
 
-    submitBtn.disabled = true;
+  // Hide form and show message screen
+  form.style.display = "none";
+  messageScreen.style.display = "block";
+  messageScreen.style.color = "blue";
+  messageScreen.textContent = "Submitting, please wait...";
 
-    const params = new URLSearchParams({
-      court: document.getElementById("court").value,
-      game_mode: document.getElementById("game_mode").value,
-      skill: document.getElementById("skill").value,
-      team_size: document.getElementById("team_size").value,
-      team_name: document.getElementById("team_name").value,
-    });
-
-    fetch("https://script.google.com/macros/s/AKfycbxr-1qIuIAetE0cPN-JL2C1gGVWDFau83QZ1rMz6sHf5hE2IHa-kWCTu26XlfoPw-Gs/exec?" + params.toString())
-      .then(response => response.text())
-      .then(result => {
-        alert("You’re checked in! 🏀");
-        form.reset();
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        alert("There was a problem checking in.");
-      })
-      .finally(() => {
-        submitBtn.disabled = false;
-        // Remove the loading message after fetch completes
-        const msg = document.getElementById("loadingMsg");
-        if (msg) msg.remove();
-      });
+  const params = new URLSearchParams({
+    court: document.getElementById("court").value,
+    game_mode: document.getElementById("game_mode").value,
+    skill: document.getElementById("skill").value,
+    team_size: document.getElementById("team_size").value,
+    team_name: document.getElementById("team_name").value,
   });
-</script>
+
+  fetch("https://script.google.com/macros/s/AKfycbxr-1qIuIAetE0cPN-JL2C1gGVWDFau83QZ1rMz6sHf5hE2IHa-kWCTu26XlfoPw-Gs/exec?" + params.toString())
+    .then(response => response.text())
+    .then(result => {
+      // Change message on success
+      messageScreen.style.color = "green";
+      messageScreen.textContent = "Thanks for checking in! 🏀";
+
+      form.reset();
+
+      // After 2 seconds, hide message and show form again
+      setTimeout(() => {
+        messageScreen.style.display = "none";
+        form.style.display = "block";
+        submitBtn.disabled = false;
+      }, 2000); //written in milliseconds
+    })
+    .catch(error => {
+      console.error("Error:", error);
+
+      messageScreen.style.color = "red";
+      messageScreen.textContent = "There was a problem checking in.";
+
+      // After 3 seconds, hide message and show form again
+      setTimeout(() => {
+        messageScreen.style.display = "none";
+        form.style.display = "block";
+        submitBtn.disabled = false;
+      }, 3000);
+    });
+});
+  </script>
 
 </body>
 </html>
