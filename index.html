@@ -95,11 +95,14 @@ form.addEventListener("submit", function(event) {
 
   submitBtn.disabled = true;
 
-  // Hide form and show message screen
+   // Hide form and show message screen
   form.style.display = "none";
   messageScreen.style.display = "block";
-  messageScreen.style.color = "blue";
+  messageScreen.style.color = "red";
+  messageScreen.style.font = "monospace"
+  messageScreen.style.fontSize = "2em"
   messageScreen.textContent = "Submitting, please wait...";
+
 
   const params = new URLSearchParams({
     court: document.getElementById("court").value,
