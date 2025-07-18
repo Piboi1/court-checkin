@@ -87,6 +87,10 @@
     document.getElementById("checkinForm").addEventListener("submit", function(event) {
       event.preventDefault();
 
+      const form = event.target
+      const submitBtn = form.querySelector("button[type='submit']");
+      submitBtn.disabled = true;
+
       const params = new URLSearchParams({
         court: document.getElementById("court").value,
         game_mode: document.getElementById("game_mode").value,
@@ -104,8 +108,11 @@
         .catch(error => {
           console.error("Error:", error);
           alert("There was a problem checking in.");
-        });
+        })
+    .finally(() => {
+      submitBtn.disabled = false;
     });
+  });
   </script>
 
 </body>
