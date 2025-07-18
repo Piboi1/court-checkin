@@ -83,37 +83,48 @@
     <button type="submit">Check In</button>
   </form>
 
-  <script>
-    document.getElementById("checkinForm").addEventListener("submit", function(event) {
-      event.preventDefault();
+<script>
+  const form = document.getElementById("checkinForm");
+  const submitBtn = form.querySelector("button[type='submit']");
 
-      const form = event.target
-      const submitBtn = form.querySelector("button[type='submit']");
-      submitBtn.disabled = true;
+  form.addEventListener("submit", function(event) {
+    event.preventDefault();
 
-      const params = new URLSearchParams({
-        court: document.getElementById("court").value,
-        game_mode: document.getElementById("game_mode").value,
-        skill: document.getElementById("skill").value,
-        team_size: document.getElementById("team_size").value,
-        team_name: document.getElementById("team_name").value,
-      });
+    // Create and show loading message
+    const loadingMsg = document.createElement("p");
+    loadingMsg.textContent = "Submitting, please wait...";
+    loadingMsg.style.color = "blue";  // optional styling
+    loadingMsg.id = "loadingMsg";     // so we can find & remove it later
+    form.appendChild(loadingMsg);
 
-      fetch("https://script.google.com/macros/s/AKfycbxr-1qIuIAetE0cPN-JL2C1gGVWDFau83QZ1rMz6sHf5hE2IHa-kWCTu26XlfoPw-Gs/exec?" + params.toString())
-        .then(response => response.text())
-        .then(result => {
-          alert("You’re checked in! 🏀");
-          document.getElementById("checkinForm").reset();
-        })
-        .catch(error => {
-          console.error("Error:", error);
-          alert("There was a problem checking in.");
-        })
-    .finally(() => {
-      submitBtn.disabled = false;
+    submitBtn.disabled = true;
+
+    const params = new URLSearchParams({
+      court: document.getElementById("court").value,
+      game_mode: document.getElementById("game_mode").value,
+      skill: document.getElementById("skill").value,
+      team_size: document.getElementById("team_size").value,
+      team_name: document.getElementById("team_name").value,
     });
+
+    fetch("https://script.google.com/macros/s/AKfycbxr-1qIuIAetE0cPN-JL2C1gGVWDFau83QZ1rMz6sHf5hE2IHa-kWCTu26XlfoPw-Gs/exec?" + params.toString())
+      .then(response => response.text())
+      .then(result => {
+        alert("You’re checked in! 🏀");
+        form.reset();
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("There was a problem checking in.");
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        // Remove the loading message after fetch completes
+        const msg = document.getElementById("loadingMsg");
+        if (msg) msg.remove();
+      });
   });
-  </script>
+</script>
 
 </body>
 </html>
