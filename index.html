@@ -61,12 +61,14 @@
       <option value="fullcourt">Full-Court</option>
     </select>
 
-    <label for="skill">Skill Level</label>
-    <select id="skill" name="skill" required>
+    <label for="needed">How many players do you need?</label>
+    <select id="needed" name="needed" required>
       <option value="">Select</option>
-      <option value="beginner">Beginner</option>
-      <option value="intermediate">Intermediate</option>
-      <option value="advanced">Advanced</option>
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4+">4+</option>
     </select>
 
     <label for="team_size">Team Size</label>
@@ -95,7 +97,7 @@ form.addEventListener("submit", function(event) {
 
   submitBtn.disabled = true;
 
-   // Hide form and show message screen
+  // Hide form and show message screen
   form.style.display = "none";
   messageScreen.style.display = "block";
   messageScreen.style.color = "red";
@@ -103,11 +105,10 @@ form.addEventListener("submit", function(event) {
   messageScreen.style.fontSize = "2em"
   messageScreen.textContent = "Submitting, please wait...";
 
-
   const params = new URLSearchParams({
     court: document.getElementById("court").value,
     game_mode: document.getElementById("game_mode").value,
-    skill: document.getElementById("skill").value,
+    needed: document.getElementById("needed").value,
     team_size: document.getElementById("team_size").value,
     team_name: document.getElementById("team_name").value,
   });
@@ -121,12 +122,12 @@ form.addEventListener("submit", function(event) {
 
       form.reset();
 
-      // After 2 seconds, hide message and show form again
+      // After 3 seconds, hide message and show form again
       setTimeout(() => {
         messageScreen.style.display = "none";
         form.style.display = "block";
         submitBtn.disabled = false;
-      }, 2000); //written in milliseconds
+      }, 3000);
     })
     .catch(error => {
       console.error("Error:", error);
