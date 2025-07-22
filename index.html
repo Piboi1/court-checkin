@@ -1,118 +1,146 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Team Submission</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🏀 Morrisville Court Check-In</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #eef;
-      padding: 30px;
-    }
-    form {
-      background: white;
+      background: #f9f9f9;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 400px;
+      max-width: 500px;
       margin: auto;
     }
+    h2 {
+      text-align: center;
+    }
     label {
+      font-weight: bold;
       display: block;
-      margin-top: 12px;
+      margin-top: 15px;
     }
-    input, select, button {
+    select, input[type="text"], button {
       width: 100%;
-      padding: 8px;
-      margin-top: 4px;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
-    .success {
-      color: green;
-      margin-top: 12px;
-    }
-    .error {
-      color: red;
-      margin-top: 12px;
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <h2 style="text-align:center">Submit Your Team</h2>
-  <form id="team-form">
-    <label for="team_name">Team Name</label>
-    <input type="text" id="team_name" required>
+  <div id="messageScreen" style="display:none; text-align:center; padding: 50px; font-size: 20px; font-weight: bold; color: blue;"></div>
 
-    <label for="court">Court</label>
-    <select id="court" required>
-      <option value="Half_court">Half Court</option>
+  <h2>🏀 Morrisville Court Check-In</h2>
+
+  <form id="checkinForm">
+    <label for="court">Which court?</label>
+    <select id="court" name="court" required>
+      <option value="">Select</option>
       <option value="Full_court">Full Court</option>
+      <option value="Half_court">Half Court</option>
     </select>
 
     <label for="game_mode">Game Mode</label>
-    <select id="game_mode" required>
+    <select id="game_mode" name="game_mode" required>
+      <option value="">Select</option>
+      <option value="1v1">1v1</option>
       <option value="2v2">2v2</option>
       <option value="3v3">3v3</option>
-      <option value="4v4">4v4</option>
-      <option value="5v5">5v5</option>
+      <option value="Other">Other</option>
     </select>
 
-    <label for="needed">Players Needed</label>
-    <input type="number" id="needed" min="1" max="10" required>
+    <label for="needed">How many more players do you need?</label>
+    <select id="needed" name="needed" required>
+      <option value="">Select</option>
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4+">4+</option>
+    </select>
 
-    <button type="submit">Submit</button>
-    <div id="status" class=""></div>
+    <label for="team_size">Team Size</label>
+    <select id="team_size" name="team_size" required>
+      <option value="">Select</option>
+      <option value="1">Solo</option>
+      <option value="2">2 People</option>
+      <option value="3">3 People</option>
+      <option value="4">4 People</option>
+      <option value="5+">5+ People</option>
+    </select>
+
+    <label for="team_name">Team Name (optional)</label>
+    <input type="text" id="team_name" name="team_name" placeholder="JumpSquad, etc.">
+
+    <button type="submit">Check In</button>
   </form>
 
   <script>
-    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxr-1qIuIAetE0cPN-JL2C1gGVWDFau83QZ1rMz6sHf5hE2IHa-kWCTu26XlfoPw-Gs/exec'; // Replace with your actual Script ID
+    const form = document.getElementById("checkinForm");
+    const submitBtn = form.querySelector("button[type='submit']");
+    const messageScreen = document.getElementById("messageScreen");
 
-    document.getElementById("team-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
 
-      const team_name = document.getElementById("team_name").value.trim();
-      const court = document.getElementById("court").value;
-      const game_mode = document.getElementById("game_mode").value;
-      const needed = parseInt(document.getElementById("needed").value);
+  submitBtn.disabled = true;
 
-      const statusDiv = document.getElementById("status");
+  // Hide form and show message screen
+  form.style.display = "none";
+  messageScreen.style.display = "block";
+  messageScreen.style.color = "red";
+  messageScreen.style.font = "monospace"
+  messageScreen.style.fontSize = "2em"
+  messageScreen.textContent = "Submitting, please wait...";
 
-      // Validation
-      if (!team_name || needed <= 0 || isNaN(needed)) {
-        statusDiv.textContent = "Please fill out all fields correctly.";
-        statusDiv.className = "error";
-        return;
-      }
+  const params = new URLSearchParams({
+    court: document.getElementById("court").value,
+    game_mode: document.getElementById("game_mode").value,
+    needed: document.getElementById("needed").value,
+    team_size: document.getElementById("team_size").value,
+    team_name: document.getElementById("team_name").value,
+  });
 
-      const payload = {
-        team_name,
-        court,
-        game_mode,
-        needed,
-        Timestamp: new Date().toISOString()
-      };
+  fetch("https://script.google.com/macros/s/AKfycbxr-1qIuIAetE0cPN-JL2C1gGVWDFau83QZ1rMz6sHf5hE2IHa-kWCTu26XlfoPw-Gs/exec?" + params.toString())
+    .then(response => response.text())
+    .then(result => {
+      // Change message on success
+      messageScreen.style.color = "green";
+      messageScreen.textContent = "Thanks for checking in! 🏀";
 
-      try {
-        const res = await fetch(SHEET_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
+      form.reset();
 
-        if (res.ok) {
-          statusDiv.textContent = "Team successfully submitted!";
-          statusDiv.className = "success";
-          document.getElementById("team-form").reset();
-        } else {
-          throw new Error("Submission failed");
-        }
-      } catch (err) {
-        statusDiv.textContent = "Error: Could not submit. Check your connection.";
-        statusDiv.className = "error";
-      }
+      // After 3 seconds, hide message and show form again
+      setTimeout(() => {
+        messageScreen.style.display = "none";
+        form.style.display = "block";
+        submitBtn.disabled = false;
+      }, 3000);
+    })
+    .catch(error => {
+      console.error("Error:", error);
+
+      messageScreen.style.color = "red";
+      messageScreen.textContent = "There was a problem checking in.";
+
+      // After 3 seconds, hide message and show form again
+      setTimeout(() => {
+        messageScreen.style.display = "none";
+        form.style.display = "block";
+        submitBtn.disabled = false;
+      }, 3000);
     });
+});
   </script>
+
 </body>
 </html>
