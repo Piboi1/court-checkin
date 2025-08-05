@@ -17,7 +17,7 @@
     }
 
     .button {
-      background-color: #FFA500; /* Orange */
+      background-color: #e48c00; /* Darker Orange */
       color: white;
       padding: 10px 20px;
       margin: 5px;
@@ -25,10 +25,15 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 16px;
+      transition: background-color 0.2s;
     }
 
     .button:hover {
-      background-color: #e69500;
+      background-color: #cc7a00;
+    }
+
+    .button.selected {
+      background-color: #b56500; /* Even darker for selected state */
     }
 
     #checkinBtn {
@@ -39,6 +44,7 @@
       border-radius: 4px;
       color: white;
       border: none;
+      cursor: pointer;
     }
 
     #checkinBtn:hover {
@@ -81,20 +87,20 @@
 
     <div class="form-container">
       <h3>Select Court Type:</h3>
-      <button class="button" onclick="setCourt('Half')">Half</button>
-      <button class="button" onclick="setCourt('Full')">Full</button>
+      <button class="button" onclick="setCourt(this, 'Half')">Half</button>
+      <button class="button" onclick="setCourt(this, 'Full')">Full</button>
 
       <h3>Select Skill Level:</h3>
-      <button class="button" onclick="setSkill('Beginner')">Beginner</button>
-      <button class="button" onclick="setSkill('Intermediate')">Intermediate</button>
-      <button class="button" onclick="setSkill('Advanced')">Advanced</button>
+      <button class="button" onclick="setSkill(this, 'Beginner')">Beginner</button>
+      <button class="button" onclick="setSkill(this, 'Intermediate')">Intermediate</button>
+      <button class="button" onclick="setSkill(this, 'Advanced')">Advanced</button>
 
       <h3>Players Needed:</h3>
-      <button class="button" onclick="setPlayers(0)">0</button>
-      <button class="button" onclick="setPlayers(1)">1</button>
-      <button class="button" onclick="setPlayers(2)">2</button>
-      <button class="button" onclick="setPlayers(3)">3</button>
-      <button class="button" onclick="setPlayers(4)">4</button>
+      <button class="button" onclick="setPlayers(this, 0)">0</button>
+      <button class="button" onclick="setPlayers(this, 1)">1</button>
+      <button class="button" onclick="setPlayers(this, 2)">2</button>
+      <button class="button" onclick="setPlayers(this, 3)">3</button>
+      <button class="button" onclick="setPlayers(this, 4)">4</button>
 
       <br><br>
       <button id="checkinBtn" onclick="submitForm()">Check In</button>
@@ -113,17 +119,37 @@
     let selectedSkill = "";
     let selectedPlayers = "";
 
-    function setCourt(court) {
+    function clearSelected(groupName) {
+      const buttons = document.querySelectorAll(`.${groupName}`);
+      buttons.forEach(btn => btn.classList.remove('selected'));
+    }
+
+    function setCourt(button, court) {
       selectedCourt = court;
+      clearSelected('court');
+      button.classList.add('selected');
     }
 
-    function setSkill(skill) {
+    function setSkill(button, skill) {
       selectedSkill = skill;
+      clearSelected('skill');
+      button.classList.add('selected');
     }
 
-    function setPlayers(players) {
+    function setPlayers(button, players) {
       selectedPlayers = players;
+      clearSelected('players');
+      button.classList.add('selected');
     }
+
+    // Assign group classes for toggling selection
+    window.onload = () => {
+      document.querySelectorAll("button").forEach(btn => {
+        if (btn.innerText === "Half" || btn.innerText === "Full") btn.classList.add("court");
+        else if (["Beginner", "Intermediate", "Advanced"].includes(btn.innerText)) btn.classList.add("skill");
+        else if (["0", "1", "2", "3", "4"].includes(btn.innerText)) btn.classList.add("players");
+      });
+    };
 
     function generateTicketNumber() {
       return Math.floor(1000 + Math.random() * 9000); // Random 4-digit number
