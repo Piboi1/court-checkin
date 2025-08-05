@@ -1,168 +1,161 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Basketball Court Check-In</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      background-color: #f9f9f9;
-      padding: 40px;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 20px;
     }
 
     h1 {
-      margin-bottom: 30px;
-    }
-
-    .section {
-      margin: 20px 0;
-    }
-
-    .button-group button {
-      margin: 6px;
-      padding: 15px 25px;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      border-radius: 8px;
-      background-color: #3CB371;
-      color: white;
-      transition: 0.2s;
-    }
-
-    .button-group button:hover {
-      background-color: #2e8b57;
-    }
-
-    .button-group button.selected {
-      background-color: #1e6844;
-    }
-
-    #submitBtn {
-      margin-top: 30px;
-      padding: 18px 45px;
-      font-size: 20px;
-      font-weight: bold;
-      background-color: #C04000; /* Darker orange */
-      border-radius: 4px;
-      border: none;
-      color: white;
-      font-family: 'Verdana', sans-serif;
-      cursor: pointer;
-    }
-
-    #submitBtn:hover {
-      background-color: #a63600;
-    }
-
-    #status {
-      margin-top: 30px;
-      font-size: 20px;
       color: #333;
     }
 
-    .ticket-title {
-      font-size: 28px;
-      color: #2e8b57;
-      margin-top: 60px;
-      margin-bottom: 20px;
+    .button {
+      background-color: #444;
+      color: white;
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .button:hover {
+      background-color: #222;
+    }
+
+    #checkinBtn {
+      background-color: #333;
+      font-weight: bold;
+      padding: 12px 24px;
+      font-size: 18px;
+      border-radius: 4px;
+    }
+
+    .form-container {
+      margin-top: 30px;
     }
 
     .ticket-box {
-      display: inline-block;
+      background-color: white;
+      border: 2px solid #333;
+      border-radius: 12px;
       padding: 40px;
-      background-color: #f0f0f0;
-      border-radius: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      font-size: 48px;
+      display: inline-block;
+      margin-top: 50px;
+    }
+
+    .ticket-number {
+      font-size: 60px;
       font-weight: bold;
-      color: #333;
+      color: #222;
+    }
+
+    .ticket-title {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    #thankYouScreen {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div id="mainContent">
+
+  <div id="formScreen">
     <h1>Basketball Court Check-In</h1>
 
-    <div class="section">
+    <div class="form-container">
       <h3>Select Court Type:</h3>
-      <div class="button-group" id="courtGroup">
-        <button onclick="selectOption('court', 'Half')">Half</button>
-        <button onclick="selectOption('court', 'Full')">Full</button>
-      </div>
-    </div>
+      <button class="button" onclick="setCourt('Half')">Half</button>
+      <button class="button" onclick="setCourt('Full')">Full</button>
 
-    <div class="section">
       <h3>Select Skill Level:</h3>
-      <div class="button-group" id="skillGroup">
-        <button onclick="selectOption('skill', 'Beginner')">Beginner</button>
-        <button onclick="selectOption('skill', 'Intermediate')">Intermediate</button>
-        <button onclick="selectOption('skill', 'Advanced')">Advanced</button>
-      </div>
+      <button class="button" onclick="setSkill('Beginner')">Beginner</button>
+      <button class="button" onclick="setSkill('Intermediate')">Intermediate</button>
+      <button class="button" onclick="setSkill('Advanced')">Advanced</button>
+
+      <h3>Players Needed:</h3>
+      <button class="button" onclick="setPlayers(0)">0</button>
+      <button class="button" onclick="setPlayers(1)">1</button>
+      <button class="button" onclick="setPlayers(2)">2</button>
+      <button class="button" onclick="setPlayers(3)">3</button>
+      <button class="button" onclick="setPlayers(4)">4</button>
+
+      <br><br>
+      <button id="checkinBtn" onclick="submitForm()">Check In</button>
     </div>
+  </div>
 
-    <div class="section">
-      <h3>How Many Players Needed?</h3>
-      <div class="button-group" id="playersGroup">
-        <button onclick="selectOption('players', 0)">0</button>
-        <button onclick="selectOption('players', 1)">1</button>
-        <button onclick="selectOption('players', 2)">2</button>
-        <button onclick="selectOption('players', 3)">3</button>
-        <button onclick="selectOption('players', 4)">4</button>
-      </div>
+  <div id="thankYouScreen">
+    <div class="ticket-box">
+      <div class="ticket-title">Your Ticket Number</div>
+      <div class="ticket-number" id="ticketDisplay"></div>
     </div>
-
-    <button id="submitBtn" onclick="submitForm()">Check In</button>
-
-    <div id="status"></div>
   </div>
 
   <script>
-    let formData = {
-      court: null,
-      skill: null,
-      players: null,
-    };
+    let selectedCourt = "";
+    let selectedSkill = "";
+    let selectedPlayers = "";
 
-    function selectOption(field, value) {
-      formData[field] = value;
+    function setCourt(court) {
+      selectedCourt = court;
+    }
 
-      const groups = {
-        court: 'courtGroup',
-        skill: 'skillGroup',
-        players: 'playersGroup'
-      };
+    function setSkill(skill) {
+      selectedSkill = skill;
+    }
 
-      const buttons = document.getElementById(groups[field]).getElementsByTagName('button');
-      for (let btn of buttons) {
-        btn.classList.remove('selected');
-      }
+    function setPlayers(players) {
+      selectedPlayers = players;
+    }
 
-      event.target.classList.add('selected');
+    function generateTicketNumber() {
+      return Math.floor(1000 + Math.random() * 9000); // Random 4-digit number
     }
 
     function submitForm() {
-      if (!formData.court || !formData.skill || formData.players === null) {
-        document.getElementById('status').innerText = "Please fill out all fields!";
+      if (!selectedCourt || !selectedSkill || selectedPlayers === "") {
+        alert("Please fill out all fields.");
         return;
       }
 
-      document.getElementById('status').innerText = "Submitting...";
+      const ticketNumber = generateTicketNumber();
 
+      // Show thank you screen
+      document.getElementById("formScreen").style.display = "none";
+      document.getElementById("thankYouScreen").style.display = "block";
+      document.getElementById("ticketDisplay").innerText = "#" + ticketNumber;
+
+      // Submit to Apps Script
+      const formData = new URLSearchParams();
+      formData.append("ticketNumber", ticketNumber);
+      formData.append("courtType", selectedCourt);
+      formData.append("skillLevel", selectedSkill);
+      formData.append("playersNeeded", selectedPlayers);
+
+      fetch("https://script.google.com/macros/s/AKfycbxr-1qIuIAetE0cPN-JL2C1gGVWDFau83QZ1rMz6sHf5hE2IHa-kWCTu26XlfoPw-Gs/exec", {
+        method: "POST",
+        body: formData
+      }).then(res => res.text())
+        .then(data => console.log(data))
+        .catch(err => console.error("Error!", err));
+
+      // Auto-refresh to form in 3 seconds
       setTimeout(() => {
-        const ticketNum = Math.floor(Math.random() * 9000) + 1000;
-
-        document.body.innerHTML = `
-          <h1 style="font-size: 36px; color: #2e8b57;">Thanks for checking in!</h1>
-          <div class="ticket-title">Your Ticket Number:</div>
-          <div class="ticket-box">#${ticketNum}</div>
-        `;
-        
-        setTimeout(() => {
-          location.reload();
-        }, 3000); // 3 seconds
-      }, 1000);
+        location.reload();
+      }, 3000);
     }
   </script>
+
 </body>
 </html>
