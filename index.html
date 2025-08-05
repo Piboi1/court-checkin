@@ -6,7 +6,7 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background-color: #f4f4f4;
+      background-color: #f9f9f9;
       padding: 40px;
     }
 
@@ -19,25 +19,40 @@
     }
 
     .button-group button {
-      margin: 5px;
+      margin: 6px;
       padding: 15px 25px;
       font-size: 16px;
       cursor: pointer;
       border: none;
-      border-radius: 5px;
-      background-color: #007BFF;
+      border-radius: 8px;
+      background-color: #3CB371; /* MediumSeaGreen */
       color: white;
+      transition: 0.2s;
+    }
+
+    .button-group button:hover {
+      background-color: #2e8b57;
     }
 
     .button-group button.selected {
-      background-color: #0056b3;
+      background-color: #1e6844;
     }
 
     #submitBtn {
       margin-top: 30px;
-      padding: 15px 40px;
-      font-size: 18px;
-      background-color: #28a745;
+      padding: 18px 45px;
+      font-size: 20px;
+      font-weight: bold;
+      background-color: #FF8C00;
+      border-radius: 10px;
+      border: none;
+      color: white;
+      font-family: 'Verdana', sans-serif;
+      cursor: pointer;
+    }
+
+    #submitBtn:hover {
+      background-color: #cc7000;
     }
 
     #status {
@@ -45,42 +60,61 @@
       font-size: 20px;
       color: #333;
     }
+
+    .ticket-box {
+      display: inline-block;
+      padding: 40px;
+      background-color: #f0f0f0;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      font-size: 48px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .details {
+      margin-top: 30px;
+      font-size: 20px;
+      color: #555;
+    }
   </style>
 </head>
 <body>
-  <h1>Basketball Court Check-In</h1>
+  <div id="mainContent">
+    <h1>Basketball Court Check-In</h1>
 
-  <div class="section">
-    <h3>Select Court Type:</h3>
-    <div class="button-group" id="courtGroup">
-      <button onclick="selectOption('court', 'Half')">Half</button>
-      <button onclick="selectOption('court', 'Full')">Full</button>
+    <div class="section">
+      <h3>Select Court Type:</h3>
+      <div class="button-group" id="courtGroup">
+        <button onclick="selectOption('court', 'Half')">Half</button>
+        <button onclick="selectOption('court', 'Full')">Full</button>
+      </div>
     </div>
-  </div>
 
-  <div class="section">
-    <h3>Select Skill Level:</h3>
-    <div class="button-group" id="skillGroup">
-      <button onclick="selectOption('skill', 'Beginner')">Beginner</button>
-      <button onclick="selectOption('skill', 'Intermediate')">Intermediate</button>
-      <button onclick="selectOption('skill', 'Advanced')">Advanced</button>
+    <div class="section">
+      <h3>Select Skill Level:</h3>
+      <div class="button-group" id="skillGroup">
+        <button onclick="selectOption('skill', 'Beginner')">Beginner</button>
+        <button onclick="selectOption('skill', 'Intermediate')">Intermediate</button>
+        <button onclick="selectOption('skill', 'Advanced')">Advanced</button>
+      </div>
     </div>
-  </div>
 
-  <div class="section">
-    <h3>How Many Players Needed?</h3>
-    <div class="button-group" id="playersGroup">
-      <button onclick="selectOption('players', 0)">0</button>
-      <button onclick="selectOption('players', 1)">1</button>
-      <button onclick="selectOption('players', 2)">2</button>
-      <button onclick="selectOption('players', 3)">3</button>
-      <button onclick="selectOption('players', 4)">4</button>
+    <div class="section">
+      <h3>How Many Players Needed?</h3>
+      <div class="button-group" id="playersGroup">
+        <button onclick="selectOption('players', 0)">0</button>
+        <button onclick="selectOption('players', 1)">1</button>
+        <button onclick="selectOption('players', 2)">2</button>
+        <button onclick="selectOption('players', 3)">3</button>
+        <button onclick="selectOption('players', 4)">4</button>
+      </div>
     </div>
+
+    <button id="submitBtn" onclick="submitForm()">Check In</button>
+
+    <div id="status"></div>
   </div>
-
-  <button id="submitBtn" onclick="submitForm()">Check In</button>
-
-  <div id="status"></div>
 
   <script>
     let formData = {
@@ -98,13 +132,11 @@
         players: 'playersGroup'
       };
 
-      // Deselect other buttons
       const buttons = document.getElementById(groups[field]).getElementsByTagName('button');
       for (let btn of buttons) {
         btn.classList.remove('selected');
       }
 
-      // Highlight selected button
       event.target.classList.add('selected');
     }
 
@@ -114,24 +146,21 @@
         return;
       }
 
-      document.getElementById('status').innerText = "Submitting, please wait...";
+      document.getElementById('status').innerText = "Submitting...";
 
-      // Send to Google Sheets via Apps Script Web App
-      fetch('YOUR_SCRIPT_URL_HERE', {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      })
-      .then(() => {
-        // Generate a dummy ticket number (replace with real response later)
+      setTimeout(() => {
         const ticketNum = Math.floor(Math.random() * 9000) + 1000;
-        document.getElementById('status').innerText = `Thanks for checking in! Your team number is: #${ticketNum}`;
-        formData = { court: null, skill: null, players: null };
-        document.querySelectorAll('.selected').forEach(btn => btn.classList.remove('selected'));
-      });
+
+        document.body.innerHTML = `
+          <h1 style="font-size: 36px; color: #2e8b57;">Thanks for checking in!</h1>
+          <div class="ticket-box">#${ticketNum}</div>
+          <div class="details">
+            <p>Court: ${formData.court}</p>
+            <p>Skill Level: ${formData.skill}</p>
+            <p>Players Needed: ${formData.players}</p>
+          </div>
+        `;
+      }, 1000);
     }
   </script>
 </body>
